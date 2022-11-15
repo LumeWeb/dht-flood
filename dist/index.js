@@ -108,5 +108,16 @@ class DHTFlood extends events_1.default {
             });
         }
     }
+    send(peer, data, ttl = this.ttl) {
+        this.messageNumber++;
+        const { id, messageNumber } = this;
+        const message = this.setupPeer(peer);
+        message.send({
+            originId: id,
+            messageNumber,
+            ttl,
+            data: b4a_1.default.from(data),
+        });
+    }
 }
 exports.default = DHTFlood;

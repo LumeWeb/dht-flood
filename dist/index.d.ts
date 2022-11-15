@@ -17,5 +17,6 @@ export default class DHTFlood extends EventEmitter {
     private handleMessage;
     private setupPeer;
     broadcast(data: any, ttl?: number): void;
+    send(peer: any, data: any, ttl?: number): void;
 }
 //# sourceMappingURL=index.d.ts.map
