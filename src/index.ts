@@ -24,7 +24,6 @@ export default class DHTFlood extends EventEmitter {
     private messageNumber: number;
     private lru: LRU;
     private swarm: any;
-    private mux: any;
 
     constructor({
                     lruSize = LRU_SIZE,
