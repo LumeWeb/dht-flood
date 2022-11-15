@@ -5,7 +5,7 @@ import LRU from "lru";
 import debug0 from "debug";
 // @ts-ignore
 import Protomux from "protomux";
-import {Packet} from "./messages.js";
+import {Packet, PacketType} from "./messages.js";
 // @ts-ignore
 import c from "compact-encoding"
 import b4a from "b4a"
@@ -49,7 +49,7 @@ export default class DHTFlood extends EventEmitter {
         });
     }
 
-    private handleMessage({originId, messageNumber, ttl, data}: Packet, messenger: any) {
+    private handleMessage({originId, messageNumber, ttl, data}: PacketType, messenger: any) {
         const originIdBuf = b4a.from(originId) as Buffer;
 
         // Ignore messages from ourselves
@@ -93,9 +93,9 @@ export default class DHTFlood extends EventEmitter {
         if (!chan.messages.length) {
             chan.addMessage({
                 encoding: {
-                    preencode: (state: any, m: any) => c.raw.preencode(state, Packet.encode(m).finish()),
-                    encode: (state: any, m: any) => c.raw.encode(state, Packet.encode(m).finish()),
-                    decode: (state: any) => Packet.decode(c.raw.decode(state)),
+                    preencode: (state: any, m: any) => c.raw.preencode(state, Packet.toBinary(Packet.create(m))),
+                    encode: (state: any, m: any) => c.raw.encode(state, Packet.toBinary(Packet.create(m))),
+                    decode: (state: any) => Packet.fromBinary(c.raw.decode(state)),
                 },
                 onmessage: (msg: any) => this.handleMessage(msg, chan.messages[0]),
             })

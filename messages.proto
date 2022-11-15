@@ -1,4 +1,5 @@
-// type=0
+syntax = "proto2";
+
 message Packet {
 	required bytes originId = 1;
 	required uint32 messageNumber = 2;
