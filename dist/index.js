@@ -104,7 +104,7 @@ class DHTFlood extends events_1.default {
                 originId: id,
                 messageNumber,
                 ttl,
-                data,
+                data: b4a_1.default.from(data),
             });
         }
     }

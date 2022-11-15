@@ -7,7 +7,7 @@ export default class DHTFlood extends EventEmitter {
     private messageNumber;
     private lru;
     private swarm;
-    constructor({ lruSize, ttl, messageNumber, id, swarm }?: {
+    constructor({ lruSize, ttl, messageNumber, id, swarm, }?: {
         lruSize?: number | undefined;
         ttl?: number | undefined;
         messageNumber?: number | undefined;
