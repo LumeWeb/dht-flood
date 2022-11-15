@@ -77,9 +77,17 @@ export default class DHTFlood extends EventEmitter {
         const mux = Protomux.from(peer);
         let chan: any;
 
+        const self = this;
+
         if (!mux.opened({protocol: PROTOCOL})) {
             chan = mux.createChannel({
                 protocol: PROTOCOL,
+                async onopen() {
+                    self.emit('peer-open', peer)
+                },
+                async ondestroy() {
+                    self.emit('peer-remove', peer)
+                },
             });
             peer[FLOOD_SYMBOL] = chan;
         }
