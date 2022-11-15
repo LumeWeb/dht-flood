@@ -137,7 +137,7 @@ export default class DHTFlood extends EventEmitter {
         originId: id,
         messageNumber,
         ttl,
-        data,
+        data: b4a.from(data),
       });
     }
   }
