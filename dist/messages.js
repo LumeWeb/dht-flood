@@ -1,144 +1,89 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Packet = exports.protobufPackage = void 0;
-/* eslint-disable */
-const _m0 = __importStar(require("protobufjs/minimal"));
-exports.protobufPackage = "";
-function createBasePacket() {
-    return { originId: new Uint8Array(), messageNumber: 0, ttl: 0, data: new Uint8Array() };
-}
-exports.Packet = {
-    encode(message, writer = _m0.Writer.create()) {
-        if (message.originId.length !== 0) {
-            writer.uint32(10).bytes(message.originId);
-        }
-        if (message.messageNumber !== 0) {
-            writer.uint32(16).uint32(message.messageNumber);
-        }
-        if (message.ttl !== 0) {
-            writer.uint32(24).uint32(message.ttl);
-        }
-        if (message.data.length !== 0) {
-            writer.uint32(34).bytes(message.data);
-        }
-        return writer;
-    },
-    decode(input, length) {
-        const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-        let end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBasePacket();
+exports.Packet = void 0;
+const runtime_1 = require("@protobuf-ts/runtime");
+const runtime_2 = require("@protobuf-ts/runtime");
+const runtime_3 = require("@protobuf-ts/runtime");
+const runtime_4 = require("@protobuf-ts/runtime");
+const runtime_5 = require("@protobuf-ts/runtime");
+// @generated message type with reflection information, may provide speed optimized methods
+class Packet$Type extends runtime_5.MessageType {
+    constructor() {
+        super("Packet", [
+            { no: 1, name: "originId", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            {
+                no: 2,
+                name: "messageNumber",
+                kind: "scalar",
+                T: 13 /*ScalarType.UINT32*/,
+            },
+            { no: 3, name: "ttl", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 4, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+        ]);
+    }
+    create(value) {
+        const message = {
+            originId: new Uint8Array(0),
+            messageNumber: 0,
+            ttl: 0,
+            data: new Uint8Array(0),
+        };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, {
+            enumerable: false,
+            value: this,
+        });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1:
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes originId */ 1:
                     message.originId = reader.bytes();
                     break;
-                case 2:
+                case /* uint32 messageNumber */ 2:
                     message.messageNumber = reader.uint32();
                     break;
-                case 3:
+                case /* uint32 ttl */ 3:
                     message.ttl = reader.uint32();
                     break;
-                case 4:
+                case /* bytes data */ 4:
                     message.data = reader.bytes();
                     break;
                 default:
-                    reader.skipType(tag & 7);
-                    break;
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
             }
         }
         return message;
-    },
-    fromJSON(object) {
-        return {
-            originId: isSet(object.originId) ? bytesFromBase64(object.originId) : new Uint8Array(),
-            messageNumber: isSet(object.messageNumber) ? Number(object.messageNumber) : 0,
-            ttl: isSet(object.ttl) ? Number(object.ttl) : 0,
-            data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
-        };
-    },
-    toJSON(message) {
-        const obj = {};
-        message.originId !== undefined &&
-            (obj.originId = base64FromBytes(message.originId !== undefined ? message.originId : new Uint8Array()));
-        message.messageNumber !== undefined && (obj.messageNumber = Math.round(message.messageNumber));
-        message.ttl !== undefined && (obj.ttl = Math.round(message.ttl));
-        message.data !== undefined &&
-            (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
-        return obj;
-    },
-    fromPartial(object) {
-        const message = createBasePacket();
-        message.originId = object.originId ?? new Uint8Array();
-        message.messageNumber = object.messageNumber ?? 0;
-        message.ttl = object.ttl ?? 0;
-        message.data = object.data ?? new Uint8Array();
-        return message;
-    },
-};
-var globalThis = (() => {
-    if (typeof globalThis !== "undefined") {
-        return globalThis;
     }
-    if (typeof self !== "undefined") {
-        return self;
-    }
-    if (typeof window !== "undefined") {
-        return window;
-    }
-    if (typeof global !== "undefined") {
-        return global;
-    }
-    throw "Unable to locate global object";
-})();
-function bytesFromBase64(b64) {
-    if (globalThis.Buffer) {
-        return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
-    }
-    else {
-        const bin = globalThis.atob(b64);
-        const arr = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; ++i) {
-            arr[i] = bin.charCodeAt(i);
-        }
-        return arr;
+    internalBinaryWrite(message, writer, options) {
+        /* bytes originId = 1; */
+        if (message.originId.length)
+            writer.tag(1, runtime_1.WireType.LengthDelimited).bytes(message.originId);
+        /* uint32 messageNumber = 2; */
+        if (message.messageNumber !== 0)
+            writer.tag(2, runtime_1.WireType.Varint).uint32(message.messageNumber);
+        /* uint32 ttl = 3; */
+        if (message.ttl !== 0)
+            writer.tag(3, runtime_1.WireType.Varint).uint32(message.ttl);
+        /* bytes data = 4; */
+        if (message.data.length)
+            writer.tag(4, runtime_1.WireType.LengthDelimited).bytes(message.data);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
     }
 }
-function base64FromBytes(arr) {
-    if (globalThis.Buffer) {
-        return globalThis.Buffer.from(arr).toString("base64");
-    }
-    else {
-        const bin = [];
-        arr.forEach((byte) => {
-            bin.push(String.fromCharCode(byte));
-        });
-        return globalThis.btoa(bin.join(""));
-    }
-}
-function isSet(value) {
-    return value !== null && value !== undefined;
-}
+/**
+ * @generated MessageType for protobuf message Packet
+ */
+exports.Packet = new Packet$Type();

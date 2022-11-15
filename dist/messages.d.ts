@@ -1,38 +1,39 @@
-import * as _m0 from "protobufjs/minimal";
-export declare const protobufPackage = "";
-/** type=0 */
-export interface Packet {
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
+import { MessageType } from "@protobuf-ts/runtime";
+/**
+ * @generated from protobuf message Packet
+ */
+export interface PacketType {
+    /**
+     * @generated from protobuf field: bytes originId = 1;
+     */
     originId: Uint8Array;
+    /**
+     * @generated from protobuf field: uint32 messageNumber = 2;
+     */
     messageNumber: number;
+    /**
+     * @generated from protobuf field: uint32 ttl = 3;
+     */
     ttl: number;
+    /**
+     * @generated from protobuf field: bytes data = 4;
+     */
     data: Uint8Array;
 }
-export declare const Packet: {
-    encode(message: Packet, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): Packet;
-    fromJSON(object: any): Packet;
-    toJSON(message: Packet): unknown;
-    fromPartial<I extends {
-        originId?: Uint8Array | undefined;
-        messageNumber?: number | undefined;
-        ttl?: number | undefined;
-        data?: Uint8Array | undefined;
-    } & {
-        originId?: Uint8Array | undefined;
-        messageNumber?: number | undefined;
-        ttl?: number | undefined;
-        data?: Uint8Array | undefined;
-    } & { [K in Exclude<keyof I, keyof Packet>]: never; }>(object: I): Packet;
-};
-declare type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
-export declare type DeepPartial<T> = T extends Builtin ? T : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> : T extends {} ? {
-    [K in keyof T]?: DeepPartial<T[K]>;
-} : Partial<T>;
-declare type KeysOfUnion<T> = T extends T ? keyof T : never;
-export declare type Exact<P, I extends P> = P extends Builtin ? P : P & {
-    [K in keyof P]: Exact<P[K], I[K]>;
-} & {
-    [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
-};
+declare class Packet$Type extends MessageType<PacketType> {
+    constructor();
+    create(value?: PartialMessage<PacketType>): PacketType;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PacketType): PacketType;
+    internalBinaryWrite(message: PacketType, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message Packet
+ */
+export declare const Packet: Packet$Type;
 export {};
 //# sourceMappingURL=messages.d.ts.map

@@ -14,7 +14,7 @@ const messages_js_1 = require("./messages.js");
 // @ts-ignore
 const compact_encoding_1 = __importDefault(require("compact-encoding"));
 const b4a_1 = __importDefault(require("b4a"));
-const debug = (0, debug_1.default)('dht-flood');
+const debug = (0, debug_1.default)("dht-flood");
 const LRU_SIZE = 255;
 const TTL = 255;
 const PROTOCOL = "lumeweb.flood";
@@ -25,14 +25,14 @@ class DHTFlood extends events_1.default {
     messageNumber;
     lru;
     swarm;
-    constructor({ lruSize = LRU_SIZE, ttl = TTL, messageNumber = 0, id = crypto_1.default.randomBytes(32), swarm = null } = {}) {
+    constructor({ lruSize = LRU_SIZE, ttl = TTL, messageNumber = 0, id = crypto_1.default.randomBytes(32), swarm = null, } = {}) {
         super();
         this.id = id;
         this.ttl = ttl;
         this.messageNumber = messageNumber;
         this.lru = new lru_1.default(lruSize);
         if (!swarm) {
-            throw new Error('swarm is required');
+            throw new Error("swarm is required");
         }
         this.swarm = swarm;
         this.swarm.on("connection", (peer) => {
@@ -44,41 +44,48 @@ class DHTFlood extends events_1.default {
         const originIdBuf = b4a_1.default.from(originId);
         // Ignore messages from ourselves
         if (originIdBuf.equals(this.id))
-            return debug('Got message from self', originId, messageNumber);
+            return debug("Got message from self", originId, messageNumber);
         // Ignore messages we've already seen
-        const key = originIdBuf.toString('hex') + messageNumber;
+        const key = originIdBuf.toString("hex") + messageNumber;
         if (this.lru.get(key))
-            return debug('Got message that was already seen', originId, messageNumber);
+            return debug("Got message that was already seen", originId, messageNumber);
         this.lru.set(key, true);
-        this.emit('message', data, originId, messageNumber);
+        this.emit("message", data, originId, messageNumber);
         if (ttl <= 0)
-            return debug('Got message at end of TTL', originId, messageNumber, ttl);
+            return debug("Got message at end of TTL", originId, messageNumber, ttl);
         messenger.send({
             originId,
             messageNumber,
             data,
-            ttl: ttl - 1
+            ttl: ttl - 1,
         });
     }
     setupPeer(peer) {
         const mux = protomux_1.default.from(peer);
         let chan;
+        const self = this;
         if (!mux.opened({ protocol: PROTOCOL })) {
             chan = mux.createChannel({
                 protocol: PROTOCOL,
+                async onopen() {
+                    self.emit("peer-open", peer);
+                },
+                async ondestroy() {
+                    self.emit("peer-remove", peer);
+                },
             });
             peer[FLOOD_SYMBOL] = chan;
         }
         chan = peer[FLOOD_SYMBOL];
         if (!chan) {
-            throw new Error('could not find channel');
+            throw new Error("could not find channel");
         }
         if (!chan.messages.length) {
             chan.addMessage({
                 encoding: {
-                    preencode: (state, m) => compact_encoding_1.default.raw.preencode(state, messages_js_1.Packet.encode(m).finish()),
-                    encode: (state, m) => compact_encoding_1.default.raw.encode(state, messages_js_1.Packet.encode(m).finish()),
-                    decode: (state) => messages_js_1.Packet.decode(compact_encoding_1.default.raw.decode(state)),
+                    preencode: (state, m) => compact_encoding_1.default.raw.preencode(state, messages_js_1.Packet.toBinary(messages_js_1.Packet.create(m))),
+                    encode: (state, m) => compact_encoding_1.default.raw.encode(state, messages_js_1.Packet.toBinary(messages_js_1.Packet.create(m))),
+                    decode: (state) => messages_js_1.Packet.fromBinary(compact_encoding_1.default.raw.decode(state)),
                 },
                 onmessage: (msg) => this.handleMessage(msg, chan.messages[0]),
             });
@@ -97,7 +104,7 @@ class DHTFlood extends events_1.default {
                 originId: id,
                 messageNumber,
                 ttl,
-                data
+                data,
             });
         }
     }
