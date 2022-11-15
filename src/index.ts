@@ -141,4 +141,17 @@ export default class DHTFlood extends EventEmitter {
       });
     }
   }
+
+  send(peer: any, data: any, ttl = this.ttl) {
+    this.messageNumber++;
+    const { id, messageNumber } = this;
+
+    const message = this.setupPeer(peer);
+    message.send({
+      originId: id,
+      messageNumber,
+      ttl,
+      data: b4a.from(data),
+    });
+  }
 }
