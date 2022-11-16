@@ -24,6 +24,7 @@ export default class DHTFlood extends EventEmitter {
   private messageNumber: number;
   private lru: LRU;
   private swarm: any;
+  private protocol: string;
 
   constructor({
     lruSize = LRU_SIZE,
@@ -31,6 +32,7 @@ export default class DHTFlood extends EventEmitter {
     messageNumber = 0,
     id = crypto.randomBytes(32),
     swarm = null,
+    protocol = PROTOCOL,
   } = {}) {
     super();
 
@@ -38,6 +40,7 @@ export default class DHTFlood extends EventEmitter {
     this.ttl = ttl;
     this.messageNumber = messageNumber;
     this.lru = new LRU(lruSize);
+    this.protocol = protocol;
     if (!swarm) {
       throw new Error("swarm is required");
     }
@@ -45,7 +48,7 @@ export default class DHTFlood extends EventEmitter {
 
     this.swarm.on("connection", (peer: any) => {
       const mux = Protomux.from(peer);
-      mux.pair({ protocol: PROTOCOL }, () => this.setupPeer(peer));
+      mux.pair({ protocol: this.protocol }, () => this.setupPeer(peer));
     });
   }
 
@@ -91,7 +94,7 @@ export default class DHTFlood extends EventEmitter {
 
     if (!mux.opened({ protocol: PROTOCOL })) {
       chan = mux.createChannel({
-        protocol: PROTOCOL,
+        protocol: this.protocol,
         async onopen() {
           self.emit("peer-open", peer);
         },
