@@ -26,19 +26,21 @@ class DHTFlood extends events_1.default {
     messageNumber;
     lru;
     swarm;
-    constructor({ lruSize = LRU_SIZE, ttl = TTL, messageNumber = 0, id = crypto_1.default.randomBytes(32), swarm = null, } = {}) {
+    protocol;
+    constructor({ lruSize = LRU_SIZE, ttl = TTL, messageNumber = 0, id = crypto_1.default.randomBytes(32), swarm = null, protocol = PROTOCOL, } = {}) {
         super();
         this.id = id;
         this.ttl = ttl;
         this.messageNumber = messageNumber;
         this.lru = new lru_1.default(lruSize);
+        this.protocol = protocol;
         if (!swarm) {
             throw new Error("swarm is required");
         }
         this.swarm = swarm;
         this.swarm.on("connection", (peer) => {
             const mux = protomux_1.default.from(peer);
-            mux.pair({ protocol: PROTOCOL }, () => this.setupPeer(peer));
+            mux.pair({ protocol: this.protocol }, () => this.setupPeer(peer));
         });
     }
     handleMessage({ originId, messageNumber, ttl, data }, messenger) {
@@ -68,7 +70,7 @@ class DHTFlood extends events_1.default {
         const self = this;
         if (!mux.opened({ protocol: PROTOCOL })) {
             chan = mux.createChannel({
-                protocol: PROTOCOL,
+                protocol: this.protocol,
                 async onopen() {
                     self.emit("peer-open", peer);
                 },
