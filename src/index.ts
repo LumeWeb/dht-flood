@@ -16,7 +16,7 @@ const LRU_SIZE = 255;
 const TTL = 255;
 const PROTOCOL = "lumeweb.flood";
 
-const FLOOD_SYMBOL = Symbol.for(PROTOCOL);
+export const FLOOD_SYMBOL = Symbol.for(PROTOCOL);
 
 export default class DHTFlood extends EventEmitter {
   private id: Buffer;
@@ -71,8 +71,9 @@ export default class DHTFlood extends EventEmitter {
 
     this.emit("message", data, originId, messageNumber);
 
-    if (ttl <= 0)
+    if (ttl <= 0) {
       return debug("Got message at end of TTL", originId, messageNumber, ttl);
+    }
 
     messenger.send({
       originId,
