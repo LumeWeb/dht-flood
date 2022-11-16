@@ -72,7 +72,7 @@ class DHTFlood extends events_1.default {
                 async onopen() {
                     self.emit("peer-open", peer);
                 },
-                async onclose() {
+                async ondestroy() {
                     self.emit("peer-remove", peer);
                 },
             });
