@@ -95,7 +95,7 @@ export default class DHTFlood extends EventEmitter {
         async onopen() {
           self.emit("peer-open", peer);
         },
-        async ondestroy() {
+        async onclose() {
           self.emit("peer-remove", peer);
         },
       });
