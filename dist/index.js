@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FLOOD_SYMBOL = void 0;
 const events_1 = __importDefault(require("events"));
 const crypto_1 = __importDefault(require("crypto"));
 // @ts-ignore
@@ -18,7 +19,7 @@ const debug = (0, debug_1.default)("dht-flood");
 const LRU_SIZE = 255;
 const TTL = 255;
 const PROTOCOL = "lumeweb.flood";
-const FLOOD_SYMBOL = Symbol.for(PROTOCOL);
+exports.FLOOD_SYMBOL = Symbol.for(PROTOCOL);
 class DHTFlood extends events_1.default {
     id;
     ttl;
@@ -51,8 +52,9 @@ class DHTFlood extends events_1.default {
             return debug("Got message that was already seen", originId, messageNumber);
         this.lru.set(key, true);
         this.emit("message", data, originId, messageNumber);
-        if (ttl <= 0)
+        if (ttl <= 0) {
             return debug("Got message at end of TTL", originId, messageNumber, ttl);
+        }
         messenger.send({
             originId,
             messageNumber,
@@ -74,9 +76,9 @@ class DHTFlood extends events_1.default {
                     self.emit("peer-remove", peer);
                 },
             });
-            peer[FLOOD_SYMBOL] = chan;
+            peer[exports.FLOOD_SYMBOL] = chan;
         }
-        chan = peer[FLOOD_SYMBOL];
+        chan = peer[exports.FLOOD_SYMBOL];
         if (!chan) {
             throw new Error("could not find channel");
         }

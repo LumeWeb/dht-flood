@@ -1,6 +1,7 @@
 /// <reference types="node" />
 /// <reference types="node" />
 import EventEmitter from "events";
+export declare const FLOOD_SYMBOL: unique symbol;
 export default class DHTFlood extends EventEmitter {
     private id;
     private ttl;
