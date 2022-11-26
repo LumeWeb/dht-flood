@@ -92,7 +92,7 @@ export default class DHTFlood extends EventEmitter {
 
     const self = this;
 
-    if (!mux.opened({ protocol: PROTOCOL })) {
+    if (!mux.opened({ protocol: this.protocol })) {
       chan = mux.createChannel({
         protocol: this.protocol,
         async onopen() {
@@ -102,7 +102,9 @@ export default class DHTFlood extends EventEmitter {
           self.emit("peer-remove", peer);
         },
       });
-      peer[FLOOD_SYMBOL] = chan;
+      if (chan) {
+        peer[FLOOD_SYMBOL] = chan;
+      }
     }
 
     chan = peer[FLOOD_SYMBOL];
