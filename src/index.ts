@@ -18,6 +18,8 @@ const PROTOCOL = "lumeweb.flood";
 
 export const FLOOD_SYMBOL = Symbol.for(PROTOCOL);
 
+const closedMap = new Map();
+
 export default class DHTFlood extends EventEmitter {
   private id: Buffer;
   private ttl: number;
@@ -91,20 +93,26 @@ export default class DHTFlood extends EventEmitter {
     let chan: any;
 
     const self = this;
-
     if (!mux.opened({ protocol: this.protocol })) {
       chan = mux.createChannel({
         protocol: this.protocol,
         async onopen() {
           self.emit("peer-open", peer);
         },
-        async ondestroy() {
-          self.emit("peer-remove", peer);
-        },
       });
       if (chan) {
         peer[FLOOD_SYMBOL] = chan;
       }
+    }
+
+    if (!closedMap.has(peer)) {
+      const close = () => {
+        self.emit("peer-remove", peer);
+        peer.removeListener("close", close);
+        closedMap.delete(peer);
+      };
+
+      peer.on("close", close);
     }
 
     chan = peer[FLOOD_SYMBOL];
