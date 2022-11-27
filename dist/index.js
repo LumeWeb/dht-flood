@@ -20,6 +20,7 @@ const LRU_SIZE = 255;
 const TTL = 255;
 const PROTOCOL = "lumeweb.flood";
 exports.FLOOD_SYMBOL = Symbol.for(PROTOCOL);
+const closedMap = new Map();
 class DHTFlood extends events_1.default {
     id;
     ttl;
@@ -74,13 +75,18 @@ class DHTFlood extends events_1.default {
                 async onopen() {
                     self.emit("peer-open", peer);
                 },
-                async ondestroy() {
-                    self.emit("peer-remove", peer);
-                },
             });
             if (chan) {
                 peer[exports.FLOOD_SYMBOL] = chan;
             }
+        }
+        if (!closedMap.has(peer)) {
+            const close = () => {
+                self.emit("peer-remove", peer);
+                peer.removeListener("close", close);
+                closedMap.delete(peer);
+            };
+            peer.on("close", close);
         }
         chan = peer[exports.FLOOD_SYMBOL];
         if (!chan) {
