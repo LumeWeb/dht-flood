@@ -32,15 +32,14 @@ test('Broadcast through several peers', (t) => {
             t.deepEquals(message, data, 'Data got  broadcast')
         })
 
-        function maybeFlood () {
+        function maybeFlood() {
             if (peer1.peers.size === 2) {
-                flood1.broadcast(data)
+                flood1.broadcast(data);
+                peer1.removeListener("connection", maybeFlood);
             }
         }
 
-        peer1.on('connection', () => {
-            maybeFlood()
-        })
+        peer1.on("connection", maybeFlood);
 
         t.teardown(() => {
             [peer1, peer2, peer3].forEach((item) => item.destroy())
