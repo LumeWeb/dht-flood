@@ -18,7 +18,7 @@ const PROTOCOL = "lumeweb.flood";
 
 export const FLOOD_SYMBOL = Symbol.for(PROTOCOL);
 
-const closedMap = new Map();
+const closedMap = new Set();
 
 export default class DHTFlood extends EventEmitter {
   private id: Buffer;
@@ -113,6 +113,7 @@ export default class DHTFlood extends EventEmitter {
       };
 
       peer.on("close", close);
+      closedMap.add(peer);
     }
 
     chan = peer[FLOOD_SYMBOL];
