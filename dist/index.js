@@ -14,6 +14,8 @@ const messages_js_1 = require("./messages.js");
 // @ts-ignore
 const compact_encoding_1 = __importDefault(require("compact-encoding"));
 const b4a_1 = __importDefault(require("b4a"));
+// @ts-ignore
+const sodium_universal_1 = __importDefault(require("sodium-universal"));
 const debug = (0, debug_1.default)("dht-flood");
 const LRU_SIZE = 255;
 const TTL = 255;
@@ -25,6 +27,7 @@ class DHTFlood extends events_1.default {
     lru;
     swarm;
     protocol;
+    topic;
     symbol;
     socketMap = new Set();
     constructor({ lruSize = LRU_SIZE, ttl = TTL, messageNumber = 0, id = crypto_1.default.randomBytes(32), swarm = null, protocol = PROTOCOL, } = {}) {
@@ -42,6 +45,11 @@ class DHTFlood extends events_1.default {
             const mux = protomux_1.default.from(peer);
             mux.pair({ protocol: this.protocol }, () => this.setupPeer(peer));
         });
+        const topic = b4a_1.default.from(this.protocol);
+        const topicHash = b4a_1.default.allocUnsafe(32);
+        sodium_universal_1.default.crypto_generichash(topicHash, topic);
+        this.topic = topicHash;
+        this.swarm.join(topicHash);
         this.symbol = Symbol.for(this.protocol);
     }
     handleMessage({ originId, messageNumber, ttl, data }, messenger) {
@@ -113,8 +121,16 @@ class DHTFlood extends events_1.default {
     broadcast(data, ttl = this.ttl) {
         this.messageNumber++;
         const { id, messageNumber } = this;
-        for (const peer of this.swarm.connections.values()) {
-            const message = this.setupPeer(peer);
+        let topicString = this.topic.toString("hex");
+        let peers = [...this.swarm.peers.values()]
+            .filter((peerInfo) => peerInfo.topics.includes(topicString))
+            .map((peerInfo) => peerInfo.publicKey);
+        for (const peer of peers) {
+            const conn = this.swarm._allConnections.get(peer);
+            if (conn) {
+                continue;
+            }
+            const message = this.setupPeer(conn);
             message.send({
                 originId: id,
                 messageNumber,
