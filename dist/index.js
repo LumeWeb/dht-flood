@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FLOOD_SYMBOL = void 0;
 const events_1 = __importDefault(require("events"));
 const crypto_1 = __importDefault(require("crypto"));
 // @ts-ignore
@@ -19,8 +18,6 @@ const debug = (0, debug_1.default)("dht-flood");
 const LRU_SIZE = 255;
 const TTL = 255;
 const PROTOCOL = "lumeweb.flood";
-exports.FLOOD_SYMBOL = Symbol.for(PROTOCOL);
-const closedMap = new Set();
 class DHTFlood extends events_1.default {
     id;
     ttl;
@@ -28,6 +25,8 @@ class DHTFlood extends events_1.default {
     lru;
     swarm;
     protocol;
+    symbol;
+    socketMap = new Set();
     constructor({ lruSize = LRU_SIZE, ttl = TTL, messageNumber = 0, id = crypto_1.default.randomBytes(32), swarm = null, protocol = PROTOCOL, } = {}) {
         super();
         this.id = id;
@@ -43,6 +42,7 @@ class DHTFlood extends events_1.default {
             const mux = protomux_1.default.from(peer);
             mux.pair({ protocol: this.protocol }, () => this.setupPeer(peer));
         });
+        this.symbol = Symbol.for(this.protocol);
     }
     handleMessage({ originId, messageNumber, ttl, data }, messenger) {
         const originIdBuf = b4a_1.default.from(originId);
@@ -77,19 +77,21 @@ class DHTFlood extends events_1.default {
                 },
             });
             if (chan) {
-                peer[exports.FLOOD_SYMBOL] = chan;
+                // @ts-ignore
+                peer[this.symbol] = chan;
             }
         }
-        if (!closedMap.has(peer)) {
+        if (!this.socketMap.has(peer)) {
             const close = () => {
                 self.emit("peer-remove", peer);
                 peer.removeListener("close", close);
-                closedMap.delete(peer);
+                this.socketMap.delete(peer);
             };
             peer.on("close", close);
-            closedMap.add(peer);
+            this.socketMap.add(peer);
         }
-        chan = peer[exports.FLOOD_SYMBOL];
+        // @ts-ignore
+        chan = peer[this.symbol];
         if (!chan) {
             throw new Error("could not find channel");
         }

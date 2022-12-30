@@ -11,27 +11,14 @@ class Packet$Type extends runtime_5.MessageType {
     constructor() {
         super("Packet", [
             { no: 1, name: "originId", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            {
-                no: 2,
-                name: "messageNumber",
-                kind: "scalar",
-                T: 13 /*ScalarType.UINT32*/,
-            },
+            { no: 2, name: "messageNumber", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
             { no: 3, name: "ttl", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
-            { no: 4, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 4, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value) {
-        const message = {
-            originId: new Uint8Array(0),
-            messageNumber: 0,
-            ttl: 0,
-            data: new Uint8Array(0),
-        };
-        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, {
-            enumerable: false,
-            value: this,
-        });
+        const message = { originId: new Uint8Array(0), messageNumber: 0, ttl: 0, data: new Uint8Array(0) };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
         return message;

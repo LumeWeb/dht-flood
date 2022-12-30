@@ -7,7 +7,7 @@ import { MessageType } from "@protobuf-ts/runtime";
 /**
  * @generated from protobuf message Packet
  */
-export interface PacketType {
+export interface Packet {
     /**
      * @generated from protobuf field: bytes originId = 1;
      */
@@ -25,11 +25,11 @@ export interface PacketType {
      */
     data: Uint8Array;
 }
-declare class Packet$Type extends MessageType<PacketType> {
+declare class Packet$Type extends MessageType<Packet> {
     constructor();
-    create(value?: PartialMessage<PacketType>): PacketType;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PacketType): PacketType;
-    internalBinaryWrite(message: PacketType, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<Packet>): Packet;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Packet): Packet;
+    internalBinaryWrite(message: Packet, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message Packet
