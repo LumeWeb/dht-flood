@@ -9,6 +9,8 @@ import { Packet } from "./messages.js";
 // @ts-ignore
 import c from "compact-encoding";
 import b4a from "b4a";
+// @ts-ignore
+import sodium from "sodium-universal";
 
 const debug = debug0("dht-flood");
 
@@ -23,6 +25,7 @@ export default class DHTFlood extends EventEmitter {
   private lru: LRU;
   private swarm: any;
   private protocol: string;
+  private topic: Buffer;
   private symbol: Symbol;
   private socketMap: Set<Function> = new Set<Function>();
 
@@ -50,6 +53,14 @@ export default class DHTFlood extends EventEmitter {
       const mux = Protomux.from(peer);
       mux.pair({ protocol: this.protocol }, () => this.setupPeer(peer));
     });
+
+    const topic = b4a.from(this.protocol);
+    const topicHash = b4a.allocUnsafe(32);
+    sodium.crypto_generichash(topicHash, topic);
+
+    this.topic = topicHash as Buffer;
+
+    this.swarm.join(topicHash);
 
     this.symbol = Symbol.for(this.protocol);
   }
@@ -148,8 +159,19 @@ export default class DHTFlood extends EventEmitter {
     this.messageNumber++;
     const { id, messageNumber } = this;
 
-    for (const peer of this.swarm.connections.values()) {
-      const message = this.setupPeer(peer);
+    let topicString = this.topic.toString("hex");
+
+    let peers: Buffer[] = [...this.swarm.peers.values()]
+      .filter((peerInfo: any) => peerInfo.topics.includes(topicString))
+      .map((peerInfo) => peerInfo.publicKey);
+
+    for (const peer of peers) {
+      const conn = this.swarm._allConnections.get(peer);
+      if (conn) {
+        continue;
+      }
+
+      const message = this.setupPeer(conn);
       message.send({
         originId: id,
         messageNumber,
