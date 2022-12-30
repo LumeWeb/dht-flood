@@ -5,7 +5,7 @@ import LRU from "lru";
 import debug0 from "debug";
 // @ts-ignore
 import Protomux from "protomux";
-import { Packet, PacketType } from "./messages.js";
+import { Packet } from "./messages.js";
 // @ts-ignore
 import c from "compact-encoding";
 import b4a from "b4a";
@@ -16,10 +16,6 @@ const LRU_SIZE = 255;
 const TTL = 255;
 const PROTOCOL = "lumeweb.flood";
 
-export const FLOOD_SYMBOL = Symbol.for(PROTOCOL);
-
-const closedMap = new Set();
-
 export default class DHTFlood extends EventEmitter {
   private id: Buffer;
   private ttl: number;
@@ -27,6 +23,8 @@ export default class DHTFlood extends EventEmitter {
   private lru: LRU;
   private swarm: any;
   private protocol: string;
+  private symbol: Symbol;
+  private socketMap: Set<Function> = new Set<Function>();
 
   constructor({
     lruSize = LRU_SIZE,
@@ -52,10 +50,12 @@ export default class DHTFlood extends EventEmitter {
       const mux = Protomux.from(peer);
       mux.pair({ protocol: this.protocol }, () => this.setupPeer(peer));
     });
+
+    this.symbol = Symbol.for(this.protocol);
   }
 
   private handleMessage(
-    { originId, messageNumber, ttl, data }: PacketType,
+    { originId, messageNumber, ttl, data }: Packet,
     messenger: any
   ) {
     const originIdBuf = b4a.from(originId) as Buffer;
@@ -101,22 +101,24 @@ export default class DHTFlood extends EventEmitter {
         },
       });
       if (chan) {
-        peer[FLOOD_SYMBOL] = chan;
+        // @ts-ignore
+        peer[this.symbol] = chan;
       }
     }
 
-    if (!closedMap.has(peer)) {
+    if (!this.socketMap.has(peer)) {
       const close = () => {
         self.emit("peer-remove", peer);
         peer.removeListener("close", close);
-        closedMap.delete(peer);
+        this.socketMap.delete(peer);
       };
 
       peer.on("close", close);
-      closedMap.add(peer);
+      this.socketMap.add(peer);
     }
 
-    chan = peer[FLOOD_SYMBOL];
+    // @ts-ignore
+    chan = peer[this.symbol];
 
     if (!chan) {
       throw new Error("could not find channel");
