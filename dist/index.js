@@ -123,11 +123,11 @@ class DHTFlood extends events_1.default {
         const { id, messageNumber } = this;
         let topicString = this.topic.toString("hex");
         let peers = [...this.swarm.peers.values()]
-            .filter((peerInfo) => peerInfo.topics.includes(topicString))
+            .filter((peerInfo) => peerInfo._seenTopics.has(topicString))
             .map((peerInfo) => peerInfo.publicKey);
         for (const peer of peers) {
             const conn = this.swarm._allConnections.get(peer);
-            if (conn) {
+            if (!conn) {
                 continue;
             }
             const message = this.setupPeer(conn);
