@@ -162,7 +162,7 @@ export default class DHTFlood extends EventEmitter {
     let topicString = this.topic.toString("hex");
 
     let peers: Buffer[] = [...this.swarm.peers.values()]
-      .filter((peerInfo: any) => peerInfo.topics.includes(topicString))
+      .filter((peerInfo: any) => peerInfo._seenTopics.has(topicString))
       .map((peerInfo) => peerInfo.publicKey);
 
     for (const peer of peers) {
