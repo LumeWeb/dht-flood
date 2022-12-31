@@ -167,7 +167,7 @@ export default class DHTFlood extends EventEmitter {
 
     for (const peer of peers) {
       const conn = this.swarm._allConnections.get(peer);
-      if (conn) {
+      if (!conn) {
         continue;
       }
 
